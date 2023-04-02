@@ -27,7 +27,7 @@ public class Order {
 
     private long customerId;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @Column(name = "productDetails")
     private List<OrderItems> productDetails = new ArrayList<>();
 
@@ -43,14 +43,6 @@ public class Order {
     @JoinColumn(name = "customer_customer_id")
     private Customer customer;
 
-    public void addOrderItem(OrderItems orderItem) {
-        productDetails.add(orderItem);
-        orderItem.setOrder(this);
-    }
 
-    public void removeOrderItem(OrderItems orderItem) {
-        productDetails.remove(orderItem);
-        orderItem.setOrder(null);
-    }
 }
 

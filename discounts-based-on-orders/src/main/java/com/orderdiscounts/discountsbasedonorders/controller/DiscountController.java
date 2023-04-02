@@ -1,7 +1,7 @@
 package com.orderdiscounts.discountsbasedonorders.controller;
 
 import com.orderdiscounts.discountsbasedonorders.model.Order;
-import com.orderdiscounts.discountsbasedonorders.model.Product;
+import com.orderdiscounts.discountsbasedonorders.model.OrderResponse;
 import com.orderdiscounts.discountsbasedonorders.repository.CustomerRepository;
 import com.orderdiscounts.discountsbasedonorders.repository.OrderRepository;
 import com.orderdiscounts.discountsbasedonorders.services.DiscountService;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/orders")
@@ -29,13 +28,13 @@ public class DiscountController {
     private DiscountService discountService;
 
     @PostMapping("/placeOrder")
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) throws ParseException {
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody Order order) throws ParseException {
         Double discountPercentage = discountService.calculateDiscount(order);
         Double totalAmountBeforeDiscount= discountService.calculateTotalAmount(order.getProductDetails());
         System.out.println(discountPercentage);
         System.out.println(totalAmountBeforeDiscount);
         System.out.println();
-        Order orderId=discountService.saveCustomerAndOrder(order,discountPercentage,totalAmountBeforeDiscount);
+        OrderResponse orderId=discountService.saveCustomerAndOrder(order,discountPercentage,totalAmountBeforeDiscount);
 
 
         return new ResponseEntity<>(orderId,HttpStatus.OK);

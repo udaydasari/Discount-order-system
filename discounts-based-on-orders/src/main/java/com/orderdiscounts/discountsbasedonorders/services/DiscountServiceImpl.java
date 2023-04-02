@@ -1,9 +1,6 @@
 package com.orderdiscounts.discountsbasedonorders.services;
 
-import com.orderdiscounts.discountsbasedonorders.model.Customer;
-import com.orderdiscounts.discountsbasedonorders.model.Order;
-import com.orderdiscounts.discountsbasedonorders.model.OrderItems;
-import com.orderdiscounts.discountsbasedonorders.model.Product;
+import com.orderdiscounts.discountsbasedonorders.model.*;
 import com.orderdiscounts.discountsbasedonorders.repository.CustomerRepository;
 import com.orderdiscounts.discountsbasedonorders.repository.OrderItemRepository;
 import com.orderdiscounts.discountsbasedonorders.repository.OrderRepository;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,10 +38,9 @@ public class DiscountServiceImpl implements DiscountService{
 
         double discountPercentage = 0.0;
 
-//        var
         Customer customer = customerRepository.findById(order.getCustomerId()).get();
         var orders= customer.getOrdersList();
-//         List<Order> ordersList= customerRepository.findOrderListById(order.getCustomerId());
+
         int orderCount=orders.size();
 
         if(orderCount > 10 && orderCount <20)
@@ -88,7 +85,7 @@ public class DiscountServiceImpl implements DiscountService{
     }
 
     @Override
-    public Order saveCustomerAndOrder(Order order, Double discountPercentage, Double totalAmountBeforeDiscount) {
+    public OrderResponse saveCustomerAndOrder(Order order, Double discountPercentage, Double totalAmountBeforeDiscount) {
         long customerId= order.getCustomerId();
 
         Optional<Customer> customerOptional= customerRepository.findById(customerId);
@@ -103,22 +100,30 @@ public class DiscountServiceImpl implements DiscountService{
                     .actualAmountBeforeDiscount(totalAmountBeforeDiscount)
                     .discountGiven(discountAmount)
                     .build();
+
+
+            List<OrderItems> orderItems = new ArrayList<>();
             for(OrderItems productDetails: order.getProductDetails()) {
-                orderToBeSaved.getProductDetails().add(productDetails);
-//                Product product = productRepository.findById(productDetails.getProductId())
-//                        .orElseThrow(() -> new RuntimeException("Product not found"));
-//                orderToBeSaved.setActualAmountBeforeDiscount(order.getActualAmountBeforeDiscount() + product.getPrice() * productDetails.getQuantity());
+                OrderItems orderItems1 = OrderItems.builder()
+                        .productId(productDetails.getProductId())
+                        .quantity(productDetails.getQuantity())
+                        // set the order for each order item
+                        .build();
+                orderItems.add(orderItems1);
             }
-             Order savedorder=orderRepository.save(orderToBeSaved);
+            order.getProductDetails().addAll(orderItems);
+       Order savedOrder=orderRepository.save(orderToBeSaved);
 
-        List<OrderItems> orderItems = order.getProductDetails();
 
-        for(OrderItems x:order.getProductDetails()){
-            x.setOrder(orderToBeSaved);
-            orderItemRepository.save(x);
-        }
-
-        return orderRepository.findById(orderToBeSaved.getOrderId()).get();
+        return OrderResponse.builder()
+                    .orderId(savedOrder.getOrderId())
+                    .customerId(savedOrder.getCustomerId())
+                    .productDetails(orderItems)
+                    .orderDate(savedOrder.getOrderDate())
+                    .actualAmountBeforeDiscount(savedOrder.getActualAmountBeforeDiscount())
+                    .totalAmountAfterDiscount(savedOrder.getTotalAmountAfterDiscount())
+                    .discountGiven(savedOrder.getDiscountGiven())
+                    .build();
 
         } else {
             throw new RuntimeException("Customer not found");
