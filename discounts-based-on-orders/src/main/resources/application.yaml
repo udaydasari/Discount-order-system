@@ -1,0 +1,19 @@
+server:
+  port: 8085
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/orderdiscount
+    username: root
+    password: Sai369uy@
+    driverClassname: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
