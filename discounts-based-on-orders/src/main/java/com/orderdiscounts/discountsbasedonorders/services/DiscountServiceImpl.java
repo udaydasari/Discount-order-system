@@ -101,17 +101,25 @@ public class DiscountServiceImpl implements DiscountService{
                     .discountGiven(discountAmount)
                     .build();
 
+            Order savedOrder=orderRepository.save(orderToBeSaved);
+
 
             List<OrderItems> orderItems = new ArrayList<>();
             for(OrderItems productDetails: order.getProductDetails()) {
                 OrderItems orderItems1 = OrderItems.builder()
                         .productId(productDetails.getProductId())
                         .quantity(productDetails.getQuantity())
+                        .order(savedOrder)
                         .build();
                 orderItems.add(orderItems1);
+
             }
+
+            orderItemRepository.saveAll(orderItems);
             order.getProductDetails().addAll(orderItems);
-       Order savedOrder=orderRepository.save(orderToBeSaved);
+       Order savedOrder1=orderRepository.save(orderToBeSaved);
+
+
 
 
         return OrderResponse.builder()
