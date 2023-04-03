@@ -46,6 +46,7 @@ public class DiscountServiceImpl implements DiscountService{
         List<Order> orderIds= orderRepository.findAllOrderIdByCustomerId(order.getCustomerId());
 
         int orderCount=orderIds.size();
+        System.out.println(orderCount);
         if(orderCount > 10 && orderCount <20)
             discountPercentage= 0.1;
         else if(orderCount > 20)
