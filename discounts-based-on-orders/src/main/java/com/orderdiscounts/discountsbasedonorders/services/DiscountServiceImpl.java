@@ -38,11 +38,14 @@ public class DiscountServiceImpl implements DiscountService{
 
         double discountPercentage = 0.0;
 
-        Customer customer = customerRepository.findById(order.getCustomerId()).get();
-        var orders= customer.getOrdersList();
+        Customer customer = customerRepository.findById(order.getCustomerId())
+                .orElseThrow(()->new RuntimeException("Customer Not found")
+        );
+        List<Order> orders = customer.getOrdersList();
 
-        int orderCount=orders.size();
+        List<Order> orderIds= orderRepository.findAllOrderIdByCustomerId(order.getCustomerId());
 
+        int orderCount=orderIds.size();
         if(orderCount > 10 && orderCount <20)
             discountPercentage= 0.1;
         else if(orderCount > 20)
@@ -50,10 +53,7 @@ public class DiscountServiceImpl implements DiscountService{
 
 
 
-        Date orderDateString = order.getOrderDate(); // Example order date
-
-        log.info(order.getOrderDate());
-        System.out.println(order.getOrderDate());
+        Date orderDateString = order.getOrderDate();
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH); // Date format of input string
         Date orderDate = null;
         orderDate = dateFormat.parse(String.valueOf(orderDateString));
@@ -107,7 +107,6 @@ public class DiscountServiceImpl implements DiscountService{
                 OrderItems orderItems1 = OrderItems.builder()
                         .productId(productDetails.getProductId())
                         .quantity(productDetails.getQuantity())
-                        // set the order for each order item
                         .build();
                 orderItems.add(orderItems1);
             }

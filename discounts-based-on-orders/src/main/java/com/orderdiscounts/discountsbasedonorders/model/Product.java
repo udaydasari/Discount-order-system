@@ -17,12 +17,12 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long productId;
 
-    //@Column(nullable = false)
+
     private String productName;
 
-    //@Column(nullable = false)
+
     private Double price;
 
-    //@Column(nullable = false)
+
     private long inStockProduct;
 }
